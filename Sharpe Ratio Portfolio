@@ -3,21 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-print("Please input the stocks you want to purchase one by one \n These are some of the stocks along with their "
-      "corresponding codes, kindly only enter the codes: \n"
-      " Apple : AAPL \n Facebook : FB \n Google : GOOG \n NVIDIA : NVDA \n Walgreens Boot Alliance : WBA"
-      "\n Microsoft : MSFT \n Bitcoin : BTC \nIf you want to invest in other names kindly enter their ticker/code. "
-      "NOTE: ENTER COMPANIES AT LEAST 3 YEARS OLD FOR HISTORICAL DATA ")
-stocks = []
-while True:
-    stock = input("Enter stock name or type 'DONE' to stop selecting stocks to evaluate ")
-    stock = stock.upper()
-    if stock == 'DONE':
-        break
-    else:
-        stocks.append(stock)
-path = "C:/Users/USER/OneDrive/Documents/Pandas dataframe portfolio.xlsx"
-
+# Variables
+stocks = ['NVS', 'AAPL', 'MSFT', 'GOOG']
 # initial_weight = np.array([0.20,0.30,0.30,0.20])
 
 RF = 0
@@ -39,8 +26,8 @@ for stock in stocks:
 portfolio = pd.concat(empresas, axis=1)
 return_stocks = portfolio.pct_change()
 
-number_of_portfolios = 4024
-
+number_of_portfolios = 2000
+RF = 0
 
 portfolio_returns = []
 portfolio_risk = []
@@ -48,9 +35,8 @@ sharpe_ratio_port = []
 portfolio_weights = []
 
 for portfolio in range(number_of_portfolios):
-    # generate a w random weight of length of number of stocks
+    # generate a w random weight of lengt of number of stocks
     weights = np.random.random_sample((len(stocks)))
-    weights = np.round(weights, 4)
 
     weights = weights / np.sum(weights)
     annualize_return = np.sum((return_stocks.mean() * weights) * 252)
@@ -63,8 +49,6 @@ for portfolio in range(number_of_portfolios):
     # sharpe_ratio
     sharpe_ratio = ((annualize_return - RF) / portfolio_standard_deviation)
     sharpe_ratio_port.append(sharpe_ratio)
-    weights = np.round(weights, 3)*100
-    weights = dict(zip(stocks, weights))
 
     portfolio_weights.append(weights)
 
@@ -85,19 +69,15 @@ portfolio_dfs = pd.DataFrame(porfolio_metrics)
 portfolio_dfs = portfolio_dfs.T
 portfolio_dfs.columns = ['Port Returns', 'Port Risk', 'Sharpe Ratio', 'Portfolio Weights']
 
-
 # convert from object to float the first three columns.
 for col in ['Port Returns', 'Port Risk', 'Sharpe Ratio']:
     portfolio_dfs[col] = portfolio_dfs[col].astype(float)
-portfolio_dfs.sort_values(by='Sharpe Ratio', ascending=False, inplace=True)
 
 # portfolio with the highest Sharpe Ratio
 Highest_sharpe_port = portfolio_dfs.iloc[portfolio_dfs['Sharpe Ratio'].idxmax()]
 # portfolio with the minimum risk
 min_risk = portfolio_dfs.iloc[portfolio_dfs['Port Risk'].idxmin()]
-portfolio_dfs.to_excel(path, sheet_name='new_sheet_name')
 
-print("For highest risk to return ratio, execute this trade portfolio: \n")
+# Highest_sharpe_port
 print(Highest_sharpe_port)
-print("For lowest risk, execute this trade portfolio")
 print(min_risk)
